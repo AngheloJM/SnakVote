@@ -2,7 +2,8 @@
   import { invoke } from "@tauri-apps/api/core";
   import { onMount } from "svelte";
   import { fade, fly, scale } from "svelte/transition";
-  import Face, { type Mood } from "$lib/Face.svelte";
+  import LottieFace from "$lib/LottieFace.svelte";
+  import type { Mood } from "$lib/mood";
 
   const KIOSK_ID = "kiosko-1"; // TODO: leer de configuración por dispositivo
 
@@ -102,7 +103,7 @@
   <div class="card">
     {#if step === "done"}
       <div class="center-content" in:scale={{ start: 0.85, duration: 350 }}>
-        <Face mood={chosen ?? "muy_satisfecho"} size={96} />
+        <LottieFace mood={chosen ?? "muy_satisfecho"} size={96} />
         <p class="thanks-text">¡Gracias por tu opinión!</p>
       </div>
     {:else if step === "sending"}
@@ -143,7 +144,9 @@
               disabled={!cameraReady}
               onclick={() => chooseSatisfaction(level.key)}
             >
-              <Face mood={level.key} size={40} delay={i * 0.15} selected={flashKey === level.key} />
+              <span class="face-wrap" class:selected={flashKey === level.key}>
+                <LottieFace mood={level.key} size={40} delay={i * 0.15} />
+              </span>
               <span>{level.label}</span>
             </button>
           {/each}
@@ -240,6 +243,16 @@
   .option-row:disabled {
     opacity: 0.5;
     cursor: not-allowed;
+  }
+
+  .face-wrap.selected {
+    animation: facePop 0.35s ease;
+  }
+
+  @keyframes facePop {
+    0% { transform: scale(1) rotate(0deg); }
+    45% { transform: scale(1.35) rotate(-8deg); }
+    100% { transform: scale(1.1) rotate(0deg); }
   }
 
   .error {

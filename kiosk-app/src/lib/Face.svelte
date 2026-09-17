@@ -1,5 +1,6 @@
 <script lang="ts">
-  export type Mood = "muy_satisfecho" | "satisfecho" | "regular" | "poco_satisfecho" | "insatisfecho";
+  import type { Mood } from "./mood";
+  export type { Mood };
 
   const MOUTHS: Record<Mood, string> = {
     muy_satisfecho: "M 20 62 Q 50 92 80 62",
