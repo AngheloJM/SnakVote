@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { AuthError, clearToken, connectVotesSocket, fetchVotes, getToken, photoUrl, updateReason } from "./api";
+import { DonutChart } from "./DonutChart";
 import { Login } from "./Login";
 import { SATISFACTION_BY_KEY, SATISFACTION_LEVELS } from "./satisfaction";
 import type { Vote } from "./types";
@@ -28,6 +29,7 @@ function App() {
   const [connected, setConnected] = useState(false);
   const [selectedPhoto, setSelectedPhoto] = useState<Vote | null>(null);
   const [reasonDraft, setReasonDraft] = useState("");
+  const [justArrivedId, setJustArrivedId] = useState<string | null>(null);
 
   function logout() {
     clearToken();
@@ -48,6 +50,8 @@ function App() {
     const disconnect = connectVotesSocket((vote) => {
       setConnected(true);
       setVotes((prev) => upsertVote(prev, vote));
+      setJustArrivedId(vote.id);
+      setTimeout(() => setJustArrivedId((id) => (id === vote.id ? null : id)), 2000);
     });
     return disconnect;
   }, [loggedIn]);
@@ -117,26 +121,8 @@ function App() {
         </div>
       </section>
 
-      <section className="proportion">
-        <div className="proportion-bar">
-          {SATISFACTION_LEVELS.map((level) => {
-            const pct = total === 0 ? 0 : (counts[level.key] / total) * 100;
-            return pct > 0 ? (
-              <div
-                key={level.key}
-                className="segment"
-                style={{ width: `${pct}%`, background: level.color }}
-              />
-            ) : null;
-          })}
-        </div>
-        <div className="legend">
-          {SATISFACTION_LEVELS.map((level) => (
-            <span key={level.key}>
-              <i className="swatch" style={{ background: level.color }} /> {level.emoji} {level.label}
-            </span>
-          ))}
-        </div>
+      <section className="donut-card">
+        <DonutChart counts={counts} total={total} />
       </section>
 
       <section className="table-wrap">
@@ -151,7 +137,7 @@ function App() {
           </thead>
           <tbody>
             {votes.map((vote) => (
-              <tr key={vote.id}>
+              <tr key={vote.id} className={vote.id === justArrivedId ? "row-new" : ""}>
                 <td>{formatDate(vote.created_at)}</td>
                 <td>
                   <span
