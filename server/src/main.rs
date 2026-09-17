@@ -17,8 +17,9 @@ use axum::{
 use models::{NewVote, UpdateReason, Vote};
 use sqlx::PgPool;
 use std::sync::Arc;
+use storage::R2Storage;
 use tokio::sync::broadcast;
-use tower_http::{cors::CorsLayer, services::ServeDir};
+use tower_http::cors::CorsLayer;
 use uuid::Uuid;
 
 struct AppState {
@@ -26,6 +27,7 @@ struct AppState {
     votes_tx: broadcast::Sender<Vote>,
     jwt_secret: String,
     kiosk_api_key: String,
+    r2: R2Storage,
 }
 
 #[tokio::main]
@@ -42,6 +44,7 @@ async fn main() -> anyhow::Result<()> {
         .expect("JWT_SECRET debe estar configurado (ver .env.example)");
     let kiosk_api_key = std::env::var("KIOSK_API_KEY")
         .expect("KIOSK_API_KEY debe estar configurado (ver .env.example)");
+    let r2 = R2Storage::from_env().expect("configuración de R2 incompleta (ver .env.example)");
 
     let (votes_tx, _) = broadcast::channel(100);
     let state = Arc::new(AppState {
@@ -49,10 +52,11 @@ async fn main() -> anyhow::Result<()> {
         votes_tx,
         jwt_secret,
         kiosk_api_key,
+        r2,
     });
 
-    let uploads = Router::new()
-        .nest_service("/uploads", ServeDir::new("uploads"))
+    let photos = Router::new()
+        .route("/uploads/{*key}", get(get_photo))
         .layer(middleware::from_fn_with_state(state.clone(), require_admin));
 
     let app = Router::new()
@@ -62,7 +66,7 @@ async fn main() -> anyhow::Result<()> {
         .route("/votes/{id}/reason", patch(update_reason))
         .route("/votes/{id}/photo", post(upload_photo))
         .route("/ws", get(ws_handler))
-        .merge(uploads)
+        .merge(photos)
         .layer(CorsLayer::permissive())
         .with_state(state);
 
@@ -162,7 +166,9 @@ async fn upload_photo(
     let bytes = field.bytes().await.map_err(|_| StatusCode::BAD_REQUEST)?;
 
     let object_key = storage::build_object_key(&kiosk_id, &id);
-    storage::upload_photo(&object_key, &bytes)
+    state
+        .r2
+        .upload_photo(&object_key, &bytes)
         .await
         .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
 
@@ -180,6 +186,18 @@ async fn upload_photo(
 
     let _ = state.votes_tx.send(vote.clone());
     Ok(Json(vote))
+}
+
+async fn get_photo(
+    State(state): State<Arc<AppState>>,
+    Path(key): Path<String>,
+) -> Result<([(axum::http::header::HeaderName, &'static str); 1], Vec<u8>), StatusCode> {
+    let bytes = state
+        .r2
+        .fetch_photo(&key)
+        .await
+        .map_err(|_| StatusCode::NOT_FOUND)?;
+    Ok(([(axum::http::header::CONTENT_TYPE, "image/jpeg")], bytes))
 }
 
 async fn ws_handler(
