@@ -1,18 +1,16 @@
 import type { Satisfaction } from "./types";
 
-// Escala ordinal good -> critical (paleta de estado de la skill de dataviz,
-// con dos tintes de verde porque son 5 niveles y solo 4 roles de estado fijos).
+// Paleta NOVA aplicada a la escala ordinal: verde éxito -> naranja de marca -> rojo error.
 export const SATISFACTION_LEVELS: {
   key: Satisfaction;
-  emoji: string;
   label: string;
   color: string;
 }[] = [
-  { key: "muy_satisfecho", emoji: "😊", label: "Muy satisfecho", color: "#0ca30c" },
-  { key: "satisfecho", emoji: "🙂", label: "Satisfecho", color: "#4caf50" },
-  { key: "regular", emoji: "😐", label: "Regular", color: "#fab219" },
-  { key: "poco_satisfecho", emoji: "🙁", label: "Poco satisfecho", color: "#ec835a" },
-  { key: "insatisfecho", emoji: "😞", label: "Insatisfecho", color: "#d03b3b" },
+  { key: "muy_satisfecho", label: "Muy satisfecho", color: "#16A344" },
+  { key: "satisfecho", label: "Satisfecho", color: "#6FCB8B" },
+  { key: "regular", label: "Regular", color: "#F59E0B" },
+  { key: "poco_satisfecho", label: "Poco satisfecho", color: "#E47704" },
+  { key: "insatisfecho", label: "Insatisfecho", color: "#EF4444" },
 ];
 
 export const SATISFACTION_BY_KEY = Object.fromEntries(

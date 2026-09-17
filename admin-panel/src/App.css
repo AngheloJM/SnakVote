@@ -1,19 +1,19 @@
 .viz-root {
   color-scheme: light;
-  --surface-1: #fcfcfb;
-  --page-plane: #f9f9f7;
-  --text-primary: #0b0b0b;
-  --text-secondary: #52514e;
-  --text-muted: #898781;
-  --gridline: #e1e0d9;
-  --border: rgba(11, 11, 11, 0.1);
-  --status-good: #0ca30c;
-  --status-critical: #d03b3b;
+  --surface-1: #ffffff;
+  --page-plane: #f8fafd;
+  --text-primary: #101828;
+  --text-secondary: #475467;
+  --text-muted: #667085;
+  --gridline: #e2e8f0;
+  --border: #e2e8f0;
+  --status-good: #16a344;
+  --status-critical: #ef4444;
 
   min-height: 100vh;
   background: var(--page-plane);
   color: var(--text-primary);
-  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-family: "Afacad", system-ui, -apple-system, "Segoe UI", sans-serif;
   padding: clamp(1rem, 3vw, 2rem);
 }
 
@@ -53,13 +53,13 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--page-plane, #f9f9f7);
+  background: var(--page-plane, #f8fafd);
   padding: 1rem;
 }
 
 .login-card {
-  background: #fcfcfb;
-  border: 1px solid rgba(11, 11, 11, 0.1);
+  background: #ffffff;
+  border: 1px solid rgba(16, 24, 40, 0.1);
   border-radius: 0.75rem;
   padding: 2rem;
   width: 100%;
@@ -76,14 +76,14 @@
 
 .login-card label {
   font-size: 0.85rem;
-  color: #52514e;
+  color: #475467;
   margin-top: 0.75rem;
 }
 
 .login-card input {
   padding: 0.6rem 0.75rem;
   border-radius: 0.5rem;
-  border: 1px solid rgba(11, 11, 11, 0.15);
+  border: 1px solid rgba(16, 24, 40, 0.15);
   font-size: 1rem;
 }
 
@@ -92,7 +92,7 @@
   padding: 0.65rem;
   border-radius: 0.5rem;
   border: none;
-  background: #0b0b0b;
+  background: #101828;
   color: white;
   font-size: 1rem;
   cursor: pointer;
@@ -104,7 +104,7 @@
 }
 
 .login-card .error {
-  color: #d03b3b;
+  color: #ef4444;
   font-size: 0.85rem;
   margin-top: 0.5rem;
 }
@@ -160,48 +160,6 @@
   margin-top: 0.2rem;
 }
 
-.proportion {
-  background: var(--surface-1);
-  border: 1px solid var(--border);
-  border-radius: 0.75rem;
-  padding: 1.25rem;
-  margin-bottom: 1.5rem;
-}
-
-.proportion-bar {
-  display: flex;
-  height: 12px;
-  border-radius: 6px;
-  overflow: hidden;
-  background: var(--gridline);
-}
-
-.segment {
-  height: 100%;
-  margin-left: 2px;
-}
-
-.segment:first-child {
-  margin-left: 0;
-}
-
-.legend {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 1rem 1.5rem;
-  margin-top: 0.75rem;
-  font-size: 0.85rem;
-  color: var(--text-secondary);
-}
-
-.swatch {
-  display: inline-block;
-  width: 10px;
-  height: 10px;
-  border-radius: 2px;
-  margin-right: 0.4rem;
-}
-
 .table-wrap {
   background: var(--surface-1);
   border: 1px solid var(--border);
@@ -210,7 +168,7 @@
 }
 
 @keyframes rowFlash {
-  0% { background: rgba(99, 102, 241, 0.18); }
+  0% { background: rgba(36, 84, 198, 0.18); }
   100% { background: transparent; }
 }
 
@@ -249,21 +207,30 @@
 }
 
 .callout-badge {
-  width: 2.5rem;
-  height: 2.5rem;
-  border-radius: 50%;
-  border: 2px solid;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.2rem;
-  background: var(--surface-1);
-  animation: badgeBounce 2.4s ease-in-out infinite;
 }
 
-@keyframes badgeBounce {
+.face {
+  display: inline-block;
+  flex-shrink: 0;
+  animation: idleBounce 2.4s ease-in-out infinite;
+}
+
+.face-eyes {
+  transform-origin: 50px 42px;
+  animation: blink 4.5s ease-in-out infinite;
+}
+
+@keyframes idleBounce {
   0%, 100% { transform: translateY(0) rotate(0deg); }
   50% { transform: translateY(-4px) rotate(-8deg); }
+}
+
+@keyframes blink {
+  0%, 92%, 100% { transform: scaleY(1); }
+  96% { transform: scaleY(0.1); }
 }
 
 .callout-pct {
@@ -346,7 +313,7 @@ tr:last-child td { border-bottom: none; }
 .link-btn {
   background: none;
   border: none;
-  color: #2a78d6;
+  color: #2454c6;
   cursor: pointer;
   padding: 0;
   font-size: 0.85rem;
@@ -356,7 +323,7 @@ tr:last-child td { border-bottom: none; }
 .modal-backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(11, 11, 11, 0.5);
+  background: rgba(16, 24, 40, 0.5);
   display: flex;
   align-items: center;
   justify-content: center;

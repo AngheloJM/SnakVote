@@ -1,3 +1,4 @@
+import { Face } from "./Face";
 import { SATISFACTION_LEVELS } from "./satisfaction";
 import type { Vote } from "./types";
 
@@ -29,11 +30,8 @@ export function DonutChart({
           const pct = total === 0 ? 0 : Math.round((count / total) * 100);
           return (
             <div className="callout" key={level.key}>
-              <div
-                className="callout-badge"
-                style={{ borderColor: level.color, animationDelay: `${i * 0.15}s` }}
-              >
-                {level.emoji}
+              <div className="callout-badge">
+                <Face mood={level.key} size={40} delay={i * 0.15} />
               </div>
               <div className="callout-pct" style={{ color: level.color }}>
                 {pct}%

@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { AuthError, clearToken, connectVotesSocket, fetchVotes, getToken, photoUrl, updateReason } from "./api";
 import { DonutChart } from "./DonutChart";
+import { Face } from "./Face";
 import { Login } from "./Login";
 import { SATISFACTION_BY_KEY, SATISFACTION_LEVELS } from "./satisfaction";
 import type { Vote } from "./types";
@@ -108,14 +109,14 @@ function App() {
           <div className="tile-value">{total}</div>
         </div>
 
-        <div className="tile" style={{ color: "#0ca30c" }}>
-          <div className="tile-label">😊🙂 Positivos</div>
+        <div className="tile" style={{ color: "#16A344" }}>
+          <div className="tile-label">Positivos</div>
           <div className="tile-value">{positivos}</div>
           <div className="tile-sub">{pctPositivo}% del total</div>
         </div>
 
-        <div className="tile" style={{ color: "#d03b3b" }}>
-          <div className="tile-label">🙁😞 Negativos</div>
+        <div className="tile" style={{ color: "#EF4444" }}>
+          <div className="tile-label">Negativos</div>
           <div className="tile-value">{negativos}</div>
           <div className="tile-sub">{100 - pctPositivo}% del total (incl. regular)</div>
         </div>
@@ -147,7 +148,7 @@ function App() {
                       background: `${SATISFACTION_BY_KEY[vote.satisfaction].color}1a`,
                     }}
                   >
-                    {SATISFACTION_BY_KEY[vote.satisfaction].emoji} {SATISFACTION_BY_KEY[vote.satisfaction].label}
+                    <Face mood={vote.satisfaction} size={20} /> {SATISFACTION_BY_KEY[vote.satisfaction].label}
                   </span>
                 </td>
                 <td className="muted">{vote.attention_or_food || "—"}</td>
