@@ -11,7 +11,14 @@ pub fn build_object_key(kiosk_id: &str, vote_id: &Uuid) -> String {
     format!("{kiosk_id}/{date}/{vote_id}.jpg")
 }
 
-pub async fn upload_photo(_object_key: &str, _bytes: &[u8]) -> anyhow::Result<()> {
-    // TODO: PUT a R2 usando credenciales con scope restringido al bucket.
+pub async fn upload_photo(object_key: &str, bytes: &[u8]) -> anyhow::Result<()> {
+    // Fallback de desarrollo: guarda en disco local bajo ./uploads.
+    // TODO: reemplazar por un PUT real a R2 (credenciales con scope
+    // restringido al bucket) manteniendo la misma firma de función.
+    let path = std::path::Path::new("uploads").join(object_key);
+    if let Some(parent) = path.parent() {
+        tokio::fs::create_dir_all(parent).await?;
+    }
+    tokio::fs::write(path, bytes).await?;
     Ok(())
 }
