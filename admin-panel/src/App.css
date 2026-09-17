@@ -218,19 +218,9 @@
   animation: idleBounce 2.4s ease-in-out infinite;
 }
 
-.face-eyes {
-  transform-origin: 50px 42px;
-  animation: blink 4.5s ease-in-out infinite;
-}
-
 @keyframes idleBounce {
   0%, 100% { transform: translateY(0) rotate(0deg); }
   50% { transform: translateY(-4px) rotate(-8deg); }
-}
-
-@keyframes blink {
-  0%, 92%, 100% { transform: scaleY(1); }
-  96% { transform: scaleY(0.1); }
 }
 
 .callout-pct {
