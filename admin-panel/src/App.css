@@ -258,6 +258,12 @@
   justify-content: center;
   font-size: 1.2rem;
   background: var(--surface-1);
+  animation: badgeBounce 2.4s ease-in-out infinite;
+}
+
+@keyframes badgeBounce {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-4px) rotate(-8deg); }
 }
 
 .callout-pct {

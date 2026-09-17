@@ -24,12 +24,15 @@ export function DonutChart({
   return (
     <div className="donut-section">
       <div className="donut-callouts">
-        {SATISFACTION_LEVELS.map((level) => {
+        {SATISFACTION_LEVELS.map((level, i) => {
           const count = counts[level.key] ?? 0;
           const pct = total === 0 ? 0 : Math.round((count / total) * 100);
           return (
             <div className="callout" key={level.key}>
-              <div className="callout-badge" style={{ borderColor: level.color }}>
+              <div
+                className="callout-badge"
+                style={{ borderColor: level.color, animationDelay: `${i * 0.15}s` }}
+              >
                 {level.emoji}
               </div>
               <div className="callout-pct" style={{ color: level.color }}>
