@@ -2,25 +2,19 @@
   import { invoke } from "@tauri-apps/api/core";
   import { onMount } from "svelte";
   import { fade, fly, scale } from "svelte/transition";
+  import Face, { type Mood } from "$lib/Face.svelte";
 
   const KIOSK_ID = "kiosko-1"; // TODO: leer de configuración por dispositivo
 
-  type SatisfactionKey =
-    | "muy_satisfecho"
-    | "satisfecho"
-    | "regular"
-    | "poco_satisfecho"
-    | "insatisfecho";
-
-  const SATISFACTION_LEVELS: { key: SatisfactionKey; emoji: string; label: string }[] = [
-    { key: "muy_satisfecho", emoji: "😊", label: "Muy satisfecho" },
-    { key: "satisfecho", emoji: "🙂", label: "Satisfecho" },
-    { key: "regular", emoji: "😐", label: "Regular" },
-    { key: "poco_satisfecho", emoji: "🙁", label: "Poco satisfecho" },
-    { key: "insatisfecho", emoji: "😞", label: "Insatisfecho" },
+  const SATISFACTION_LEVELS: { key: Mood; label: string }[] = [
+    { key: "muy_satisfecho", label: "Muy satisfecho" },
+    { key: "satisfecho", label: "Satisfecho" },
+    { key: "regular", label: "Regular" },
+    { key: "poco_satisfecho", label: "Poco satisfecho" },
+    { key: "insatisfecho", label: "Insatisfecho" },
   ];
 
-  const QUICK_COMMENTS: Record<SatisfactionKey, string[]> = {
+  const QUICK_COMMENTS: Record<Mood, string[]> = {
     muy_satisfecho: ["Atención rápida", "Muy amable", "Buena comida", "Buena presentación", "Todo excelente"],
     satisfecho: ["Buena atención", "Trato amable", "Comida rica", "Buena variedad", "Cumplió lo esperado"],
     regular: ["Atención normal", "Comida aceptable", "Podría mejorar", "Espera normal", "Sin comentarios"],
@@ -33,7 +27,7 @@
   let cameraReady = $state(false);
   let cameraError = $state("");
   let step = $state<"satisfaction" | "comment" | "sending" | "done">("satisfaction");
-  let chosen = $state<SatisfactionKey | null>(null);
+  let chosen = $state<Mood | null>(null);
   let flashKey = $state<string | null>(null);
 
   onMount(async () => {
@@ -63,7 +57,7 @@
     return new Promise((resolve) => setTimeout(resolve, ms));
   }
 
-  async function chooseSatisfaction(satisfaction: SatisfactionKey) {
+  async function chooseSatisfaction(satisfaction: Mood) {
     if (!cameraReady || flashKey) return;
     flashKey = satisfaction;
     await wait(280);
@@ -108,7 +102,7 @@
   <div class="card">
     {#if step === "done"}
       <div class="center-content" in:scale={{ start: 0.85, duration: 350 }}>
-        <p class="big-emoji">🙏</p>
+        <Face mood={chosen ?? "muy_satisfecho"} size={96} />
         <p class="thanks-text">¡Gracias por tu opinión!</p>
       </div>
     {:else if step === "sending"}
@@ -149,7 +143,7 @@
               disabled={!cameraReady}
               onclick={() => chooseSatisfaction(level.key)}
             >
-              <span class="row-emoji" style="animation-delay: {i * 0.15}s">{level.emoji}</span>
+              <Face mood={level.key} size={40} delay={i * 0.15} selected={flashKey === level.key} />
               <span>{level.label}</span>
             </button>
           {/each}
@@ -172,28 +166,28 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    background: linear-gradient(160deg, #0f172a, #111827 60%);
+    background: linear-gradient(160deg, #041476, #101828 65%);
     padding: clamp(1rem, 4vw, 2rem);
     box-sizing: border-box;
-    font-family: system-ui, sans-serif;
+    font-family: "Afacad", system-ui, sans-serif;
   }
 
   .card {
-    background: white;
+    background: #ffffff;
     border-radius: 1.75rem;
-    box-shadow: 0 30px 60px -20px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 30px 60px -20px rgba(4, 20, 118, 0.45);
     width: min(94vw, 30rem);
     max-height: 92dvh;
     overflow-y: auto;
     padding: clamp(1.5rem, 4vw, 2.5rem);
     box-sizing: border-box;
-    color: #0f172a;
+    color: #101828;
   }
 
   .progress {
     font-size: 0.85rem;
     font-weight: 600;
-    color: #6366f1;
+    color: #2454c6;
     text-transform: uppercase;
     letter-spacing: 0.05em;
     margin-bottom: 0.5rem;
@@ -219,17 +213,18 @@
     text-align: left;
     padding: 1.1rem 1.25rem;
     border-radius: 1rem;
-    border: 2px solid #e5e7eb;
-    background: #f9fafb;
+    border: 2px solid #e2e8f0;
+    background: #f8fafd;
+    font-family: inherit;
     font-size: clamp(1rem, 2.2vw, 1.15rem);
-    color: #1f2937;
+    color: #101828;
     cursor: pointer;
     transition: transform 0.15s ease, background 0.2s ease, border-color 0.2s ease;
   }
 
   .option-row:hover:not(:disabled) {
-    border-color: #c7d2fe;
-    background: #f5f6ff;
+    border-color: #5b7fe5;
+    background: #eef3ff;
   }
 
   .option-row:active:not(:disabled) {
@@ -237,8 +232,8 @@
   }
 
   .option-row.selected {
-    background: #eef2ff;
-    border-color: #6366f1;
+    background: #eef3ff;
+    border-color: #2454c6;
     transform: scale(0.98);
   }
 
@@ -247,32 +242,10 @@
     cursor: not-allowed;
   }
 
-  .row-emoji {
-    display: inline-block;
-    font-size: 1.6rem;
-    line-height: 1;
-    animation: idleBounce 2.4s ease-in-out infinite;
-  }
-
-  @keyframes idleBounce {
-    0%, 100% { transform: translateY(0) rotate(0deg); }
-    50% { transform: translateY(-5px) rotate(-6deg); }
-  }
-
-  @keyframes emojiPop {
-    0% { transform: scale(1) rotate(0deg); }
-    45% { transform: scale(1.5) rotate(-10deg); }
-    100% { transform: scale(1.15) rotate(0deg); }
-  }
-
-  .option-row.selected .row-emoji {
-    animation: emojiPop 0.35s ease;
-  }
-
   .error {
-    color: #b45309;
-    background: #fffbeb;
-    border: 1px solid #fde68a;
+    color: #e47704;
+    background: #fff4e8;
+    border: 1px solid #f59a45;
     border-radius: 0.75rem;
     padding: 0.75rem 1rem;
     font-size: 0.9rem;
@@ -280,13 +253,17 @@
   }
 
   .center-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     text-align: center;
     padding: 2rem 0;
+    gap: 1rem;
   }
 
   .big-emoji {
     font-size: 4rem;
-    margin: 0 0 1rem;
+    margin: 0;
   }
 
   .big-emoji.spin {
