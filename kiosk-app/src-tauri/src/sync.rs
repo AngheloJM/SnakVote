@@ -4,10 +4,14 @@ use std::path::PathBuf;
 use std::sync::atomic::{AtomicBool, Ordering};
 use tauri::Manager;
 
-// TODO: mover a un archivo de configuración leído en runtime en vez de
-// compilarlo fijo, para poder apuntar cada kiosko a un servidor distinto
-// sin recompilar.
-const SERVER_URL: &str = "http://127.0.0.1:3000";
+// Se toma de la variable de entorno SERVER_URL al compilar. Como este
+// proyecto es para un solo kiosko, no vale la pena una pantalla de
+// configuración en runtime: si el día de mañana cambia la dirección del
+// servidor, se recompila una vez con el nuevo valor.
+const SERVER_URL: &str = match option_env!("SERVER_URL") {
+    Some(url) => url,
+    None => "http://127.0.0.1:3000",
+};
 
 // Se toma de la variable de entorno KIOSK_API_KEY al compilar (no se
 // commitea el valor real: el repo es público). Para desarrollo local usa el

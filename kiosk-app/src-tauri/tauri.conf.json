@@ -1,6 +1,6 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "productName": "kiosk-app",
+  "productName": "VotoKiosco",
   "version": "0.1.0",
   "identifier": "com.shoshan.kiosk-app",
   "build": {
@@ -12,7 +12,7 @@
   "app": {
     "windows": [
       {
-        "title": "kiosk-app",
+        "title": "VotoKiosco",
         "width": 800,
         "height": 600
       }

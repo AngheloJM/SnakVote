@@ -27,11 +27,15 @@
   let canvasEl: HTMLCanvasElement;
   let cameraReady = $state(false);
   let cameraError = $state("");
-  let step = $state<"satisfaction" | "comment" | "sending" | "done">("satisfaction");
+  let step = $state<"splash" | "satisfaction" | "comment" | "sending" | "done">("splash");
   let chosen = $state<Mood | null>(null);
   let flashKey = $state<string | null>(null);
 
   onMount(async () => {
+    setTimeout(() => {
+      if (step === "splash") step = "satisfaction";
+    }, 2200);
+
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
         video: { facingMode: "user" },
@@ -101,7 +105,19 @@
   <canvas bind:this={canvasEl} class="hidden-video"></canvas>
 
   <div class="card">
-    {#if step === "done"}
+    {#if step === "splash"}
+      <div class="splash" out:fade={{ duration: 200 }}>
+        <h1 class="splash-title" in:scale={{ start: 0.7, duration: 500 }}>VotoKiosco</h1>
+        <p class="splash-subtitle" in:fade={{ delay: 200, duration: 400 }}>Tu opinión nos importa</p>
+        <div class="splash-faces">
+          {#each SATISFACTION_LEVELS as level, i}
+            <span in:scale={{ delay: 400 + i * 120, start: 0.4, duration: 350 }}>
+              <EmojiFace mood={level.key} size={44} delay={i * 0.15} />
+            </span>
+          {/each}
+        </div>
+      </div>
+    {:else if step === "done"}
       <div class="center-content" in:scale={{ start: 0.85, duration: 350 }}>
         <EmojiFace mood={chosen ?? "muy_satisfecho"} size={96} />
         <p class="thanks-text">¡Gracias por tu opinión!</p>
@@ -272,6 +288,33 @@
     text-align: center;
     padding: 2rem 0;
     gap: 1rem;
+  }
+
+  .splash {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 2.5rem 0;
+    gap: 0.5rem;
+  }
+
+  .splash-title {
+    font-size: clamp(2rem, 7vw, 3rem);
+    font-weight: 700;
+    color: #2454c6;
+    margin: 0;
+  }
+
+  .splash-subtitle {
+    color: #667085;
+    font-size: 1.1rem;
+    margin: 0 0 1.5rem;
+  }
+
+  .splash-faces {
+    display: flex;
+    gap: 0.75rem;
   }
 
   .big-emoji {
