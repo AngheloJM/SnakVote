@@ -2,7 +2,7 @@
   import { invoke } from "@tauri-apps/api/core";
   import { onMount } from "svelte";
   import { fade, fly, scale } from "svelte/transition";
-  import LottieFace from "$lib/LottieFace.svelte";
+  import EmojiFace from "$lib/EmojiFace.svelte";
   import type { Mood } from "$lib/mood";
 
   const KIOSK_ID = "kiosko-1"; // TODO: leer de configuración por dispositivo
@@ -103,7 +103,7 @@
   <div class="card">
     {#if step === "done"}
       <div class="center-content" in:scale={{ start: 0.85, duration: 350 }}>
-        <LottieFace mood={chosen ?? "muy_satisfecho"} size={96} />
+        <EmojiFace mood={chosen ?? "muy_satisfecho"} size={96} />
         <p class="thanks-text">¡Gracias por tu opinión!</p>
       </div>
     {:else if step === "sending"}
@@ -145,7 +145,7 @@
               onclick={() => chooseSatisfaction(level.key)}
             >
               <span class="face-wrap" class:selected={flashKey === level.key}>
-                <LottieFace mood={level.key} size={40} delay={i * 0.15} />
+                <EmojiFace mood={level.key} size={40} delay={i * 0.15} />
               </span>
               <span>{level.label}</span>
             </button>
