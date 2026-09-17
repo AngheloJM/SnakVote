@@ -142,14 +142,14 @@
         {/if}
 
         <div class="option-list">
-          {#each SATISFACTION_LEVELS as level}
+          {#each SATISFACTION_LEVELS as level, i}
             <button
               class="option-row"
               class:selected={flashKey === level.key}
               disabled={!cameraReady}
               onclick={() => chooseSatisfaction(level.key)}
             >
-              <span class="row-emoji">{level.emoji}</span>
+              <span class="row-emoji" style="animation-delay: {i * 0.15}s">{level.emoji}</span>
               <span>{level.label}</span>
             </button>
           {/each}
@@ -248,8 +248,25 @@
   }
 
   .row-emoji {
+    display: inline-block;
     font-size: 1.6rem;
     line-height: 1;
+    animation: idleBounce 2.4s ease-in-out infinite;
+  }
+
+  @keyframes idleBounce {
+    0%, 100% { transform: translateY(0) rotate(0deg); }
+    50% { transform: translateY(-5px) rotate(-6deg); }
+  }
+
+  @keyframes emojiPop {
+    0% { transform: scale(1) rotate(0deg); }
+    45% { transform: scale(1.5) rotate(-10deg); }
+    100% { transform: scale(1.15) rotate(0deg); }
+  }
+
+  .option-row.selected .row-emoji {
+    animation: emojiPop 0.35s ease;
   }
 
   .error {
