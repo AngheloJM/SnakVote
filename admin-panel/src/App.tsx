@@ -109,13 +109,13 @@ function App() {
           <div className="tile-value">{total}</div>
         </div>
 
-        <div className="tile" style={{ color: "#16A344" }}>
+        <div className="tile" style={{ color: "#2454C6" }}>
           <div className="tile-label">Positivos</div>
           <div className="tile-value">{positivos}</div>
           <div className="tile-sub">{pctPositivo}% del total</div>
         </div>
 
-        <div className="tile" style={{ color: "#EF4444" }}>
+        <div className="tile" style={{ color: "#E47704" }}>
           <div className="tile-label">Negativos</div>
           <div className="tile-value">{negativos}</div>
           <div className="tile-sub">{100 - pctPositivo}% del total (incl. regular)</div>

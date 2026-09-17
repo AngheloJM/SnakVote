@@ -7,8 +7,8 @@
   --text-muted: #667085;
   --gridline: #e2e8f0;
   --border: #e2e8f0;
-  --status-good: #16a344;
-  --status-critical: #ef4444;
+  --status-good: #2454c6;
+  --status-critical: #e47704;
 
   min-height: 100vh;
   background: var(--page-plane);
@@ -104,7 +104,7 @@
 }
 
 .login-card .error {
-  color: #ef4444;
+  color: #e47704;
   font-size: 0.85rem;
   margin-top: 0.5rem;
 }

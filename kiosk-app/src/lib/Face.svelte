@@ -10,13 +10,13 @@
     insatisfecho: "M 18 84 Q 50 56 82 84",
   };
 
-  // Paleta NOVA: verde éxito -> naranja de marca -> rojo error.
+  // Paleta NOVA reducida a azul/naranja/neutro (sin verde ni rojo).
   const COLORS: Record<Mood, string> = {
-    muy_satisfecho: "#16A344",
-    satisfecho: "#6FCB8B",
-    regular: "#F59E0B",
-    poco_satisfecho: "#E47704",
-    insatisfecho: "#EF4444",
+    muy_satisfecho: "#2454C6",
+    satisfecho: "#5B7FE5",
+    regular: "#667085",
+    poco_satisfecho: "#F59A45",
+    insatisfecho: "#E47704",
   };
 
   let {

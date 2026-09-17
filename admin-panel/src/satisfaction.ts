@@ -1,16 +1,17 @@
 import type { Satisfaction } from "./types";
 
-// Paleta NOVA aplicada a la escala ordinal: verde éxito -> naranja de marca -> rojo error.
+// Paleta NOVA reducida a azul/naranja/neutro (sin verde ni rojo):
+// azul principal -> azul medio -> gris neutro -> naranja suave -> naranja conecta.
 export const SATISFACTION_LEVELS: {
   key: Satisfaction;
   label: string;
   color: string;
 }[] = [
-  { key: "muy_satisfecho", label: "Muy satisfecho", color: "#16A344" },
-  { key: "satisfecho", label: "Satisfecho", color: "#6FCB8B" },
-  { key: "regular", label: "Regular", color: "#F59E0B" },
-  { key: "poco_satisfecho", label: "Poco satisfecho", color: "#E47704" },
-  { key: "insatisfecho", label: "Insatisfecho", color: "#EF4444" },
+  { key: "muy_satisfecho", label: "Muy satisfecho", color: "#2454C6" },
+  { key: "satisfecho", label: "Satisfecho", color: "#5B7FE5" },
+  { key: "regular", label: "Regular", color: "#667085" },
+  { key: "poco_satisfecho", label: "Poco satisfecho", color: "#F59A45" },
+  { key: "insatisfecho", label: "Insatisfecho", color: "#E47704" },
 ];
 
 export const SATISFACTION_BY_KEY = Object.fromEntries(

@@ -10,13 +10,13 @@ const MOUTHS: Record<Mood, { v0: [number, number]; c: [number, number]; v1: [num
   insatisfecho: { v0: [-32, 34], c: [0, 6], v1: [32, 34] },
 };
 
-// Paleta NOVA: verde éxito -> naranja de marca -> rojo error.
+// Paleta NOVA reducida a azul/naranja/neutro (sin verde ni rojo).
 const COLORS: Record<Mood, [number, number, number]> = {
-  muy_satisfecho: hexToRgb("#16A344"),
-  satisfecho: hexToRgb("#6FCB8B"),
-  regular: hexToRgb("#F59E0B"),
-  poco_satisfecho: hexToRgb("#E47704"),
-  insatisfecho: hexToRgb("#EF4444"),
+  muy_satisfecho: hexToRgb("#2454C6"),
+  satisfecho: hexToRgb("#5B7FE5"),
+  regular: hexToRgb("#667085"),
+  poco_satisfecho: hexToRgb("#F59A45"),
+  insatisfecho: hexToRgb("#E47704"),
 };
 
 const INK: [number, number, number] = hexToRgb("#101828");
