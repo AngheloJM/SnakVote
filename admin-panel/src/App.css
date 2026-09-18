@@ -661,6 +661,16 @@ th {
   border-bottom: 1px solid var(--gridline);
 }
 
+th.sortable {
+  cursor: pointer;
+  user-select: none;
+  white-space: nowrap;
+}
+
+th.sortable:hover {
+  color: var(--text-primary);
+}
+
 td {
   padding: 0.65rem 1rem;
   border-bottom: 1px solid var(--gridline);

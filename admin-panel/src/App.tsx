@@ -28,6 +28,13 @@ function formatDate(iso: string): string {
   });
 }
 
+type SortKey = "date" | "satisfaction" | "comment";
+type SortDir = "asc" | "desc";
+
+const SATISFACTION_RANK = Object.fromEntries(
+  SATISFACTION_LEVELS.map((level, i) => [level.key, i]),
+) as Record<Vote["satisfaction"], number>;
+
 function App() {
   const [loggedIn, setLoggedIn] = useState(() => Boolean(getToken()));
   const [votes, setVotes] = useState<Vote[]>([]);
@@ -37,6 +44,22 @@ function App() {
   const [dateRange, setDateRange] = useState<DateRange>(PRESETS[3]);
   const [chartView, setChartView] = useState<"donut" | "bar">("donut");
   const [commentFilter, setCommentFilter] = useState<string | null>(null);
+  const [sortKey, setSortKey] = useState<SortKey>("date");
+  const [sortDir, setSortDir] = useState<SortDir>("desc");
+
+  function toggleSort(key: SortKey) {
+    if (sortKey === key) {
+      setSortDir((d) => (d === "asc" ? "desc" : "asc"));
+    } else {
+      setSortKey(key);
+      setSortDir(key === "date" ? "desc" : "asc");
+    }
+  }
+
+  function sortIndicator(key: SortKey) {
+    if (sortKey !== key) return "";
+    return sortDir === "asc" ? " ▲" : " ▼";
+  }
 
   function logout() {
     clearToken();
@@ -70,6 +93,22 @@ function App() {
     () => (commentFilter ? votes.filter((v) => v.attention_or_food === commentFilter) : votes),
     [votes, commentFilter],
   );
+
+  const sortedVotes = useMemo(() => {
+    const arr = [...filteredVotes];
+    arr.sort((a, b) => {
+      let cmp = 0;
+      if (sortKey === "date") {
+        cmp = new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
+      } else if (sortKey === "satisfaction") {
+        cmp = SATISFACTION_RANK[a.satisfaction] - SATISFACTION_RANK[b.satisfaction];
+      } else {
+        cmp = (a.attention_or_food ?? "").localeCompare(b.attention_or_food ?? "");
+      }
+      return sortDir === "asc" ? cmp : -cmp;
+    });
+    return arr;
+  }, [filteredVotes, sortKey, sortDir]);
 
   const { counts, total } = useMemo(() => {
     const counts = Object.fromEntries(SATISFACTION_LEVELS.map((l) => [l.key, 0])) as Record<
@@ -172,14 +211,20 @@ function App() {
         <table>
           <thead>
             <tr>
-              <th>Fecha</th>
-              <th>Satisfacción</th>
-              <th>Comentario</th>
+              <th className="sortable" onClick={() => toggleSort("date")}>
+                Fecha{sortIndicator("date")}
+              </th>
+              <th className="sortable" onClick={() => toggleSort("satisfaction")}>
+                Satisfacción{sortIndicator("satisfaction")}
+              </th>
+              <th className="sortable" onClick={() => toggleSort("comment")}>
+                Comentario{sortIndicator("comment")}
+              </th>
               <th>Foto</th>
             </tr>
           </thead>
           <tbody>
-            {filteredVotes.map((vote) => (
+            {sortedVotes.map((vote) => (
               <tr key={vote.id} className={vote.id === justArrivedId ? "row-new" : ""}>
                 <td>{formatDate(vote.created_at)}</td>
                 <td>
