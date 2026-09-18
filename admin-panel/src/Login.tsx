@@ -44,7 +44,18 @@ export function Login({ onSuccess }: { onSuccess: () => void }) {
   return (
     <div className="login-screen">
       <section className="login-blob-panel">
-        <div className="login-blob" />
+        <svg className="login-blob" viewBox="0 0 100 100" preserveAspectRatio="none">
+          <defs>
+            <linearGradient id="blobGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stopColor="#041476" />
+              <stop offset="75%" stopColor="#2454c6" />
+            </linearGradient>
+          </defs>
+          <path
+            d="M0,0 L64,0 C52,14 74,24 60,37 C46,50 70,58 56,73 C44,86 50,94 40,100 L0,100 Z"
+            fill="url(#blobGrad)"
+          />
+        </svg>
         <ConectaLogo />
         <div className="login-illustration">
           {RISING_BUBBLES.map((b, i) => (

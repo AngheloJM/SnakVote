@@ -57,8 +57,9 @@
 .login-blob {
   position: absolute;
   inset: 0;
-  background: linear-gradient(160deg, #041476, #2454c6 70%);
-  border-radius: 0 45% 35% 0 / 0 60% 40% 0;
+  width: 100%;
+  height: 100%;
+  display: block;
 }
 
 .conecta-logo {
@@ -127,26 +128,23 @@
 .login-blob-text {
   position: absolute;
   z-index: 1;
-  bottom: clamp(2.5rem, 5vw, 4rem);
-  left: 0;
-  right: 0;
-  text-align: center;
+  bottom: clamp(4rem, 10vw, 6rem);
+  left: clamp(1.5rem, 3vw, 2.5rem);
+  max-width: min(60%, 20rem);
+  text-align: left;
   color: #ffffff;
-  padding: 0 2rem;
 }
 
 .login-blob-text h1 {
-  font-size: clamp(2rem, 3.2vw, 3.25rem);
+  font-size: clamp(1.75rem, 2.6vw, 2.5rem);
   font-weight: 700;
   margin: 0 0 0.5rem;
 }
 
 .login-blob-text p {
-  font-size: clamp(1rem, 1.25vw, 1.3rem);
+  font-size: clamp(0.9rem, 1.1vw, 1.1rem);
   color: #eef3ff;
   margin: 0;
-  max-width: 28rem;
-  margin-inline: auto;
 }
 
 .login-form-panel {
@@ -185,10 +183,6 @@
 
   .login-blob-panel {
     min-height: 20rem;
-  }
-
-  .login-blob {
-    border-radius: 0 0 45% 45% / 0 0 25% 25%;
   }
 
   .login-form-panel {
