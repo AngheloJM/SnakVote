@@ -1,0 +1,4 @@
+# Forzar saltos de línea Unix (LF) sin importar el sistema operativo que
+# clona/hace checkout. Sin esto, Windows convierte a CRLF y el checksum de
+# las migraciones de sqlx deja de coincidir con lo ya aplicado en la base.
+* text=auto eol=lf
