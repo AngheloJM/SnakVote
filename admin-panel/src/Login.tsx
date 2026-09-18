@@ -2,6 +2,24 @@ import { useState } from "react";
 import { login } from "./api";
 import { ConectaLogo } from "./ConectaLogo";
 import { Face } from "./Face";
+import type { Satisfaction } from "./types";
+
+const RISING_BUBBLES: {
+  left: number;
+  size: number;
+  mood: Satisfaction;
+  duration: number;
+  delay: number;
+}[] = [
+  { left: 6, size: 52, mood: "muy_satisfecho", duration: 14, delay: 0 },
+  { left: 20, size: 36, mood: "satisfecho", duration: 11, delay: 2.2 },
+  { left: 36, size: 64, mood: "muy_satisfecho", duration: 17, delay: 4.5 },
+  { left: 13, size: 30, mood: "satisfecho", duration: 9, delay: 6.5 },
+  { left: 29, size: 46, mood: "muy_satisfecho", duration: 13, delay: 1.2 },
+  { left: 3, size: 40, mood: "satisfecho", duration: 15.5, delay: 8.5 },
+  { left: 41, size: 34, mood: "muy_satisfecho", duration: 10, delay: 3.5 },
+  { left: 23, size: 56, mood: "satisfecho", duration: 18, delay: 5.8 },
+];
 
 export function Login({ onSuccess }: { onSuccess: () => void }) {
   const [email, setEmail] = useState("");
@@ -29,21 +47,21 @@ export function Login({ onSuccess }: { onSuccess: () => void }) {
         <div className="login-blob" />
         <ConectaLogo />
         <div className="login-illustration">
-          <div className="chat-bubble bubble-1">
-            <Face mood="muy_satisfecho" size={44} />
-          </div>
-          <div className="chat-bubble bubble-2">
-            <Face mood="satisfecho" size={60} delay={0.15} />
-          </div>
-          <div className="chat-bubble bubble-3">
-            <Face mood="muy_satisfecho" size={80} delay={0.3} />
-          </div>
-          <div className="chat-bubble bubble-4">
-            <Face mood="satisfecho" size={52} delay={0.45} />
-          </div>
-          <div className="chat-bubble bubble-5">
-            <Face mood="muy_satisfecho" size={36} delay={0.6} />
-          </div>
+          {RISING_BUBBLES.map((b, i) => (
+            <div
+              key={i}
+              className="chat-bubble bubble-rise"
+              style={{
+                width: b.size,
+                height: b.size,
+                left: `${b.left}%`,
+                animationDuration: `${b.duration}s`,
+                animationDelay: `${b.delay}s`,
+              }}
+            >
+              <Face mood={b.mood} size={b.size * 0.68} />
+            </div>
+          ))}
         </div>
         <div className="login-blob-text">
           <h1>VotoKiosco</h1>
