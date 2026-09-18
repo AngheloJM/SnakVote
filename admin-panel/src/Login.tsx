@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { login } from "./api";
+import { ConectaLogo } from "./ConectaLogo";
 import { Face } from "./Face";
 
 export function Login({ onSuccess }: { onSuccess: () => void }) {
@@ -26,12 +27,22 @@ export function Login({ onSuccess }: { onSuccess: () => void }) {
     <div className="login-screen">
       <section className="login-blob-panel">
         <div className="login-blob" />
+        <ConectaLogo />
         <div className="login-illustration">
-          <div className="chat-bubble chat-bubble-big">
-            <Face mood="muy_satisfecho" size={64} />
+          <div className="chat-bubble bubble-1">
+            <Face mood="muy_satisfecho" size={44} />
           </div>
-          <div className="chat-bubble chat-bubble-small">
-            <Face mood="satisfecho" size={40} delay={0.2} />
+          <div className="chat-bubble bubble-2">
+            <Face mood="satisfecho" size={60} delay={0.15} />
+          </div>
+          <div className="chat-bubble bubble-3">
+            <Face mood="muy_satisfecho" size={80} delay={0.3} />
+          </div>
+          <div className="chat-bubble bubble-4">
+            <Face mood="satisfecho" size={52} delay={0.45} />
+          </div>
+          <div className="chat-bubble bubble-5">
+            <Face mood="muy_satisfecho" size={36} delay={0.6} />
           </div>
         </div>
         <div className="login-blob-text">
