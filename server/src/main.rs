@@ -6,7 +6,7 @@ use auth::{AdminAuth, KioskAuth};
 use axum::{
     extract::{
         ws::{Message, WebSocket, WebSocketUpgrade},
-        FromRequestParts, Multipart, Path, Request, State,
+        FromRequestParts, Multipart, Path, Query, Request, State,
     },
     http::StatusCode,
     middleware::{self, Next},
@@ -14,7 +14,9 @@ use axum::{
     routing::{get, patch, post},
     Json, Router,
 };
+use chrono::{DateTime, Utc};
 use models::{NewVote, UpdateReason, Vote};
+use serde::Deserialize;
 use sqlx::PgPool;
 use std::sync::Arc;
 use storage::R2Storage;
@@ -113,10 +115,28 @@ async fn create_vote(
     Json(vote)
 }
 
-async fn list_votes(State(state): State<Arc<AppState>>, _auth: AdminAuth) -> Json<Vec<Vote>> {
+#[derive(Deserialize)]
+struct VotesQuery {
+    from: Option<DateTime<Utc>>,
+    to: Option<DateTime<Utc>>,
+}
+
+async fn list_votes(
+    State(state): State<Arc<AppState>>,
+    _auth: AdminAuth,
+    Query(q): Query<VotesQuery>,
+) -> Json<Vec<Vote>> {
     let votes = sqlx::query_as::<_, Vote>(
-        "SELECT id, kiosk_id, satisfaction, attention_or_food, photo_key, reason, created_at, synced_at FROM votes ORDER BY created_at DESC",
+        r#"
+        SELECT id, kiosk_id, satisfaction, attention_or_food, photo_key, reason, created_at, synced_at
+        FROM votes
+        WHERE ($1::timestamptz IS NULL OR created_at >= $1)
+          AND ($2::timestamptz IS NULL OR created_at <= $2)
+        ORDER BY created_at DESC
+        "#,
     )
+    .bind(q.from)
+    .bind(q.to)
     .fetch_all(&state.db)
     .await
     .expect("list votes");
