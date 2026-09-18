@@ -29,19 +29,6 @@
   margin: 0;
 }
 
-.status-dot {
-  font-size: 0.85rem;
-  color: var(--text-muted);
-  padding: 0.3rem 0.8rem;
-  border-radius: 999px;
-  border: 1px solid var(--border);
-}
-
-.status-dot.live {
-  color: var(--status-good);
-  border-color: var(--status-good);
-}
-
 .topbar-right {
   display: flex;
   align-items: center;

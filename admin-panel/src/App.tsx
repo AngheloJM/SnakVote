@@ -27,7 +27,6 @@ function formatDate(iso: string): string {
 function App() {
   const [loggedIn, setLoggedIn] = useState(() => Boolean(getToken()));
   const [votes, setVotes] = useState<Vote[]>([]);
-  const [connected, setConnected] = useState(false);
   const [selectedPhoto, setSelectedPhoto] = useState<Vote | null>(null);
   const [reasonDraft, setReasonDraft] = useState("");
   const [justArrivedId, setJustArrivedId] = useState<string | null>(null);
@@ -48,14 +47,11 @@ function App() {
         else console.error(err);
       });
 
-    const disconnect = connectVotesSocket(
-      (vote) => {
-        setVotes((prev) => upsertVote(prev, vote));
-        setJustArrivedId(vote.id);
-        setTimeout(() => setJustArrivedId((id) => (id === vote.id ? null : id)), 2000);
-      },
-      setConnected,
-    );
+    const disconnect = connectVotesSocket((vote) => {
+      setVotes((prev) => upsertVote(prev, vote));
+      setJustArrivedId(vote.id);
+      setTimeout(() => setJustArrivedId((id) => (id === vote.id ? null : id)), 2000);
+    });
     return disconnect;
   }, [loggedIn]);
 
@@ -98,9 +94,6 @@ function App() {
       <header className="topbar">
         <h1>Satisfacción del comedor</h1>
         <div className="topbar-right">
-          <span className={`status-dot ${connected ? "live" : ""}`}>
-            {connected ? "En vivo" : "Conectando…"}
-          </span>
           <button className="link-btn" onClick={logout}>Salir</button>
         </div>
       </header>
