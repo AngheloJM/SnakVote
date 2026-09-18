@@ -62,6 +62,23 @@
   display: block;
 }
 
+.wave-wide {
+  display: none;
+}
+
+/* Panel alto y angosto (desktop de dos columnas) usa la ola vertical;
+   panel bajo y ancho (móvil apilado, o ventana de poca altura) usa la
+   ola horizontal — el mismo path estirado sin uniformidad se deforma. */
+@media (max-width: 800px), (max-height: 500px) {
+  .wave-tall {
+    display: none;
+  }
+
+  .wave-wide {
+    display: block;
+  }
+}
+
 .conecta-logo {
   position: absolute;
   z-index: 2;

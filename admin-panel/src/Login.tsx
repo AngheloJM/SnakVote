@@ -52,7 +52,13 @@ export function Login({ onSuccess }: { onSuccess: () => void }) {
             </linearGradient>
           </defs>
           <path
+            className="wave-tall"
             d="M0,0 L88,0 C74,10 94,20 80,30 C68,40 90,48 76,58 C64,66 86,74 72,84 C60,92 68,97 58,100 L0,100 Z"
+            fill="url(#blobGrad)"
+          />
+          <path
+            className="wave-wide"
+            d="M0,0 L100,0 L100,68 C88,78 82,62 70,72 C58,82 52,66 40,76 C28,86 22,70 10,80 C6,83 3,79 0,82 Z"
             fill="url(#blobGrad)"
           />
         </svg>
