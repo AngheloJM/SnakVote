@@ -31,8 +31,12 @@ function authHeaders(): HeadersInit {
   return token ? { Authorization: `Bearer ${token}` } : {};
 }
 
-export async function fetchVotes(): Promise<Vote[]> {
-  const res = await fetch(`${SERVER_URL}/votes`, { headers: authHeaders() });
+export async function fetchVotes(range?: { from?: Date; to?: Date }): Promise<Vote[]> {
+  const params = new URLSearchParams();
+  if (range?.from) params.set("from", range.from.toISOString());
+  if (range?.to) params.set("to", range.to.toISOString());
+  const qs = params.toString();
+  const res = await fetch(`${SERVER_URL}/votes${qs ? `?${qs}` : ""}`, { headers: authHeaders() });
   if (res.status === 401) throw new AuthError();
   if (!res.ok) throw new Error("no se pudieron cargar los votos");
   return res.json();

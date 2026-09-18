@@ -326,6 +326,191 @@
   margin-bottom: 1.5rem;
 }
 
+.donut-card h3 {
+  margin: 0 0 1rem;
+  font-size: 1rem;
+  color: var(--text-primary);
+}
+
+.date-filter {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.date-filter-btn {
+  padding: 0.4rem 0.9rem;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--surface-1);
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.date-filter-btn.active {
+  background: #2454c6;
+  border-color: #2454c6;
+  color: #ffffff;
+}
+
+.chart-toggle {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.chart-toggle button {
+  padding: 0.35rem 0.9rem;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--surface-1);
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.chart-toggle button.active {
+  background: var(--text-primary);
+  border-color: var(--text-primary);
+  color: #ffffff;
+}
+
+.split-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.bar-chart {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.bar-row {
+  display: grid;
+  grid-template-columns: 10rem 1fr 5rem;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.bar-row-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+.bar-track {
+  height: 10px;
+  border-radius: 999px;
+  background: var(--gridline);
+  overflow: hidden;
+}
+
+.bar-fill {
+  height: 100%;
+  border-radius: 999px;
+  transition: width 0.4s ease;
+}
+
+.bar-value {
+  font-size: 0.85rem;
+  text-align: right;
+  color: var(--text-primary);
+}
+
+.trend-chart {
+  position: relative;
+}
+
+.trend-svg {
+  width: 100%;
+  height: auto;
+}
+
+.trend-svg circle {
+  cursor: pointer;
+}
+
+.trend-tooltip {
+  position: absolute;
+  top: 0;
+  right: 0;
+  background: var(--text-primary);
+  color: #ffffff;
+  padding: 0.3rem 0.6rem;
+  border-radius: 0.4rem;
+  font-size: 0.8rem;
+}
+
+.comments-freq {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.comment-freq-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 6rem 2rem;
+  align-items: center;
+  gap: 0.6rem;
+  background: none;
+  border: none;
+  padding: 0.3rem 0;
+  cursor: pointer;
+  text-align: left;
+  font-family: inherit;
+}
+
+.comment-freq-label {
+  font-size: 0.85rem;
+  color: var(--text-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.comment-freq-track {
+  height: 8px;
+  border-radius: 999px;
+  background: var(--gridline);
+  overflow: hidden;
+}
+
+.comment-freq-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: #2454c6;
+}
+
+.comment-freq-count {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  text-align: right;
+}
+
+.comment-freq-row.active .comment-freq-label {
+  font-weight: 700;
+  color: #2454c6;
+}
+
+.comment-freq-clear {
+  align-self: flex-start;
+  margin-top: 0.3rem;
+  background: none;
+  border: none;
+  color: #e47704;
+  font-size: 0.8rem;
+  cursor: pointer;
+  padding: 0;
+  font-family: inherit;
+}
+
 .donut-section {
   display: flex;
   flex-direction: column;

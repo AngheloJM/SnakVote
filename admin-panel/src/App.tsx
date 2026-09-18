@@ -1,9 +1,13 @@
 import { useEffect, useMemo, useState } from "react";
 import { AuthError, clearToken, connectVotesSocket, fetchVotes, getToken, photoUrl, updateReason } from "./api";
+import { BarChart } from "./BarChart";
+import { CommentsFrequency } from "./CommentsFrequency";
+import { DateRangeFilter, PRESETS, type DateRange } from "./DateRangeFilter";
 import { DonutChart } from "./DonutChart";
 import { Face } from "./Face";
 import { Login } from "./Login";
 import { SATISFACTION_BY_KEY, SATISFACTION_LEVELS } from "./satisfaction";
+import { TrendChart } from "./TrendChart";
 import type { Vote } from "./types";
 import "./App.css";
 
@@ -30,6 +34,9 @@ function App() {
   const [selectedPhoto, setSelectedPhoto] = useState<Vote | null>(null);
   const [reasonDraft, setReasonDraft] = useState("");
   const [justArrivedId, setJustArrivedId] = useState<string | null>(null);
+  const [dateRange, setDateRange] = useState<DateRange>(PRESETS[3]);
+  const [chartView, setChartView] = useState<"donut" | "bar">("donut");
+  const [commentFilter, setCommentFilter] = useState<string | null>(null);
 
   function logout() {
     clearToken();
@@ -40,12 +47,16 @@ function App() {
   useEffect(() => {
     if (!loggedIn) return;
 
-    fetchVotes()
+    fetchVotes({ from: dateRange.from, to: dateRange.to })
       .then(setVotes)
       .catch((err) => {
         if (err instanceof AuthError) logout();
         else console.error(err);
       });
+  }, [loggedIn, dateRange]);
+
+  useEffect(() => {
+    if (!loggedIn) return;
 
     const disconnect = connectVotesSocket((vote) => {
       setVotes((prev) => upsertVote(prev, vote));
@@ -55,14 +66,19 @@ function App() {
     return disconnect;
   }, [loggedIn]);
 
+  const filteredVotes = useMemo(
+    () => (commentFilter ? votes.filter((v) => v.attention_or_food === commentFilter) : votes),
+    [votes, commentFilter],
+  );
+
   const { counts, total } = useMemo(() => {
     const counts = Object.fromEntries(SATISFACTION_LEVELS.map((l) => [l.key, 0])) as Record<
       Vote["satisfaction"],
       number
     >;
-    for (const vote of votes) counts[vote.satisfaction] = (counts[vote.satisfaction] ?? 0) + 1;
-    return { counts, total: votes.length };
-  }, [votes]);
+    for (const vote of filteredVotes) counts[vote.satisfaction] = (counts[vote.satisfaction] ?? 0) + 1;
+    return { counts, total: filteredVotes.length };
+  }, [filteredVotes]);
 
   const positivos = counts.muy_satisfecho + counts.satisfecho;
   const negativos = counts.poco_satisfecho + counts.insatisfecho;
@@ -98,6 +114,8 @@ function App() {
         </div>
       </header>
 
+      <DateRangeFilter value={dateRange} onChange={setDateRange} />
+
       <section className="tiles">
         <div className="tile">
           <div className="tile-label">Total de votos</div>
@@ -118,7 +136,36 @@ function App() {
       </section>
 
       <section className="donut-card">
-        <DonutChart counts={counts} total={total} />
+        <div className="chart-toggle">
+          <button
+            className={chartView === "donut" ? "active" : ""}
+            onClick={() => setChartView("donut")}
+          >
+            Dona
+          </button>
+          <button
+            className={chartView === "bar" ? "active" : ""}
+            onClick={() => setChartView("bar")}
+          >
+            Barras
+          </button>
+        </div>
+        {chartView === "donut" ? (
+          <DonutChart counts={counts} total={total} />
+        ) : (
+          <BarChart counts={counts} total={total} />
+        )}
+      </section>
+
+      <section className="split-cards">
+        <div className="donut-card trend-card">
+          <h3>Tendencia de votos</h3>
+          <TrendChart votes={filteredVotes} />
+        </div>
+        <div className="donut-card">
+          <h3>Comentarios más frecuentes</h3>
+          <CommentsFrequency votes={votes} selected={commentFilter} onSelect={setCommentFilter} />
+        </div>
       </section>
 
       <section className="table-wrap">
@@ -132,7 +179,7 @@ function App() {
             </tr>
           </thead>
           <tbody>
-            {votes.map((vote) => (
+            {filteredVotes.map((vote) => (
               <tr key={vote.id} className={vote.id === justArrivedId ? "row-new" : ""}>
                 <td>{formatDate(vote.created_at)}</td>
                 <td>
@@ -158,7 +205,7 @@ function App() {
                 </td>
               </tr>
             ))}
-            {votes.length === 0 && (
+            {filteredVotes.length === 0 && (
               <tr>
                 <td colSpan={4} className="muted empty">
                   Todavía no hay votos registrados.
