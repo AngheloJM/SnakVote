@@ -46,7 +46,7 @@
 
 .login-blob-panel {
   position: relative;
-  flex: 1 1 48%;
+  flex: 1 1 50%;
   min-height: 34rem;
   display: flex;
   align-items: center;
@@ -148,7 +148,7 @@
 }
 
 .login-form-panel {
-  flex: 1 1 52%;
+  flex: 1 1 50%;
   display: flex;
   align-items: center;
   justify-content: center;

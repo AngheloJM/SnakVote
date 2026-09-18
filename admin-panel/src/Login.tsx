@@ -52,7 +52,7 @@ export function Login({ onSuccess }: { onSuccess: () => void }) {
             </linearGradient>
           </defs>
           <path
-            d="M0,0 L90,0 C76,15 96,25 83,38 C69,51 91,60 79,75 C67,88 74,95 62,100 L0,100 Z"
+            d="M0,0 L88,0 C74,10 94,20 80,30 C68,40 90,48 76,58 C64,66 86,74 72,84 C60,92 68,97 58,100 L0,100 Z"
             fill="url(#blobGrad)"
           />
         </svg>
