@@ -9,6 +9,7 @@ import { Login } from "./Login";
 import { SATISFACTION_BY_KEY, SATISFACTION_LEVELS } from "./satisfaction";
 import { TrendChart } from "./TrendChart";
 import type { Vote } from "./types";
+import { useCountUp } from "./useCountUp";
 import "./App.css";
 
 function upsertVote(votes: Vote[], incoming: Vote): Vote[] {
@@ -123,6 +124,10 @@ function App() {
   const negativos = counts.poco_satisfecho + counts.insatisfecho;
   const pctPositivo = total === 0 ? 0 : Math.round((positivos / total) * 100);
 
+  const totalDisplay = useCountUp(total);
+  const positivosDisplay = useCountUp(positivos);
+  const negativosDisplay = useCountUp(negativos);
+
   function openVote(vote: Vote) {
     setSelectedPhoto(vote);
     setReasonDraft(vote.reason ?? "");
@@ -158,18 +163,18 @@ function App() {
       <section className="tiles">
         <div className="tile">
           <div className="tile-label">Total de votos</div>
-          <div className="tile-value">{total}</div>
+          <div className="tile-value">{totalDisplay}</div>
         </div>
 
         <div className="tile" style={{ color: "#2454C6" }}>
           <div className="tile-label">Positivos</div>
-          <div className="tile-value">{positivos}</div>
+          <div className="tile-value">{positivosDisplay}</div>
           <div className="tile-sub">{pctPositivo}% del total</div>
         </div>
 
         <div className="tile" style={{ color: "#E47704" }}>
           <div className="tile-label">Negativos</div>
-          <div className="tile-value">{negativos}</div>
+          <div className="tile-value">{negativosDisplay}</div>
           <div className="tile-sub">{100 - pctPositivo}% del total (incl. regular)</div>
         </div>
       </section>
@@ -189,14 +194,16 @@ function App() {
             Barras
           </button>
         </div>
-        {chartView === "donut" ? (
-          <DonutChart counts={counts} total={total} />
-        ) : (
-          <BarChart counts={counts} total={total} />
-        )}
+        <div className="chart-view" key={chartView}>
+          {chartView === "donut" ? (
+            <DonutChart counts={counts} total={total} />
+          ) : (
+            <BarChart counts={counts} total={total} />
+          )}
+        </div>
       </section>
 
-      <section className="split-cards">
+      <section className="split-cards" key={dateRange.label}>
         <div className="donut-card trend-card">
           <h3>Tendencia de votos</h3>
           <TrendChart votes={filteredVotes} />
@@ -207,7 +214,7 @@ function App() {
         </div>
       </section>
 
-      <section className="table-wrap">
+      <section className="table-wrap" key={`table-${dateRange.label}`}>
         <table>
           <thead>
             <tr>
