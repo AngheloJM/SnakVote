@@ -54,13 +54,48 @@ export function photoUrl(photoKey: string): string {
   return `${SERVER_URL}/uploads/${photoKey}?token=${encodeURIComponent(token)}`;
 }
 
-export function connectVotesSocket(onVote: (vote: Vote) => void): () => void {
-  const token = getToken() ?? "";
-  const ws = new WebSocket(
-    `${SERVER_URL.replace("http", "ws")}/ws?token=${encodeURIComponent(token)}`,
-  );
-  ws.onmessage = (event) => {
-    onVote(JSON.parse(event.data));
+export function connectVotesSocket(
+  onVote: (vote: Vote) => void,
+  onStatusChange?: (connected: boolean) => void,
+): () => void {
+  let closedByCaller = false;
+  let ws: WebSocket | null = null;
+  let retryTimer: ReturnType<typeof setTimeout> | null = null;
+  let retryDelay = 1000;
+  const maxRetryDelay = 15000;
+
+  function connect() {
+    const token = getToken() ?? "";
+    ws = new WebSocket(
+      `${SERVER_URL.replace("http", "ws")}/ws?token=${encodeURIComponent(token)}`,
+    );
+
+    ws.onopen = () => {
+      retryDelay = 1000;
+      onStatusChange?.(true);
+    };
+
+    ws.onmessage = (event) => {
+      onVote(JSON.parse(event.data));
+    };
+
+    ws.onclose = () => {
+      onStatusChange?.(false);
+      if (closedByCaller) return;
+      retryTimer = setTimeout(connect, retryDelay);
+      retryDelay = Math.min(retryDelay * 2, maxRetryDelay);
+    };
+
+    ws.onerror = () => {
+      ws?.close();
+    };
+  }
+
+  connect();
+
+  return () => {
+    closedByCaller = true;
+    if (retryTimer) clearTimeout(retryTimer);
+    ws?.close(1000);
   };
-  return () => ws.close(1000);
 }

@@ -48,12 +48,14 @@ function App() {
         else console.error(err);
       });
 
-    const disconnect = connectVotesSocket((vote) => {
-      setConnected(true);
-      setVotes((prev) => upsertVote(prev, vote));
-      setJustArrivedId(vote.id);
-      setTimeout(() => setJustArrivedId((id) => (id === vote.id ? null : id)), 2000);
-    });
+    const disconnect = connectVotesSocket(
+      (vote) => {
+        setVotes((prev) => upsertVote(prev, vote));
+        setJustArrivedId(vote.id);
+        setTimeout(() => setJustArrivedId((id) => (id === vote.id ? null : id)), 2000);
+      },
+      setConnected,
+    );
     return disconnect;
   }, [loggedIn]);
 
