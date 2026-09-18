@@ -6,5 +6,10 @@ node_modules
 .env
 .env.*
 !.env.example
+
+# Clave de firma de Android: nunca debe subirse al repo. Guárdala aparte
+# (gestor de contraseñas / backup externo) — si se pierde, no se pueden
+# publicar actualizaciones sobre la app ya instalada.
+/keystore/
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
