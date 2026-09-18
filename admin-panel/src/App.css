@@ -73,8 +73,8 @@
 }
 
 .conecta-logo svg {
-  width: clamp(28px, 2vw, 36px);
-  height: clamp(28px, 2vw, 36px);
+  width: clamp(38px, 3.2vw, 56px);
+  height: clamp(38px, 3.2vw, 56px);
 }
 
 .conecta-logo-text {
@@ -82,7 +82,7 @@
   flex-direction: column;
   color: #ffffff;
   font-weight: 700;
-  font-size: clamp(0.95rem, 1.1vw, 1.15rem);
+  font-size: clamp(1.25rem, 1.8vw, 1.75rem);
   letter-spacing: 0.03em;
   line-height: 1.1;
 }
@@ -90,7 +90,7 @@
 .conecta-logo-text small {
   color: #f59a45;
   font-weight: 500;
-  font-size: clamp(0.55rem, 0.65vw, 0.7rem);
+  font-size: clamp(0.7rem, 0.9vw, 0.9rem);
   letter-spacing: 0.05em;
 }
 
@@ -130,7 +130,7 @@
   z-index: 1;
   bottom: clamp(4rem, 10vw, 6rem);
   left: clamp(1.5rem, 3vw, 2.5rem);
-  max-width: min(60%, 20rem);
+  max-width: min(65%, 24rem);
   text-align: left;
   color: #ffffff;
 }
