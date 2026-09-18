@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { login } from "./api";
+import { Face } from "./Face";
+import { SATISFACTION_LEVELS } from "./satisfaction";
 
 export function Login({ onSuccess }: { onSuccess: () => void }) {
   const [email, setEmail] = useState("");
@@ -23,35 +25,49 @@ export function Login({ onSuccess }: { onSuccess: () => void }) {
 
   return (
     <div className="login-screen">
-      <form className="login-card" onSubmit={handleSubmit}>
-        <h1>Panel de satisfacción</h1>
-        <p className="muted">Ingresa con tu cuenta de RRHH/supervisión</p>
+      <section className="login-brand">
+        <div className="login-brand-content">
+          <h1 className="login-brand-title">VotoKiosco</h1>
+          <p className="login-brand-subtitle">Panel de satisfacción del comedor</p>
+          <div className="login-brand-faces">
+            {SATISFACTION_LEVELS.map((level, i) => (
+              <Face key={level.key} mood={level.key} size={56} delay={i * 0.15} />
+            ))}
+          </div>
+        </div>
+      </section>
 
-        <label htmlFor="email">Correo</label>
-        <input
-          id="email"
-          type="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-          autoFocus
-        />
+      <section className="login-form-panel">
+        <form className="login-card" onSubmit={handleSubmit}>
+          <h2>Bienvenido de nuevo</h2>
+          <p className="muted">Ingresa con tu cuenta de RRHH/supervisión</p>
 
-        <label htmlFor="password">Contraseña</label>
-        <input
-          id="password"
-          type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-        />
+          <label htmlFor="email">Correo</label>
+          <input
+            id="email"
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+            autoFocus
+          />
 
-        {error && <p className="error">{error}</p>}
+          <label htmlFor="password">Contraseña</label>
+          <input
+            id="password"
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+          />
 
-        <button type="submit" className="primary" disabled={loading}>
-          {loading ? "Ingresando..." : "Ingresar"}
-        </button>
-      </form>
+          {error && <p className="error">{error}</p>}
+
+          <button type="submit" className="primary" disabled={loading}>
+            {loading ? "Ingresando..." : "Ingresar"}
+          </button>
+        </form>
+      </section>
     </div>
   );
 }

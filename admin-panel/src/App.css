@@ -50,28 +50,87 @@
 
 .login-screen {
   min-height: 100vh;
+  width: 100%;
+  display: flex;
+  font-family: "Afacad", system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+
+.login-brand {
+  flex: 1 1 50%;
+  min-height: 40vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(160deg, #041476, #2454c6 65%);
+  padding: 3rem 2rem;
+}
+
+.login-brand-content {
+  text-align: center;
+  color: #ffffff;
+  max-width: 26rem;
+}
+
+.login-brand-title {
+  font-size: clamp(2.25rem, 5vw, 3rem);
+  font-weight: 700;
+  margin: 0 0 0.5rem;
+}
+
+.login-brand-subtitle {
+  font-size: 1.1rem;
+  color: #eef3ff;
+  margin: 0 0 2rem;
+}
+
+.login-brand-faces {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.login-form-panel {
+  flex: 1 1 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   background: var(--page-plane, #f8fafd);
-  padding: 1rem;
+  padding: 2rem;
 }
 
 .login-card {
   background: #ffffff;
   border: 1px solid rgba(16, 24, 40, 0.1);
   border-radius: 0.75rem;
-  padding: 2rem;
+  padding: 2.5rem;
   width: 100%;
-  max-width: 22rem;
+  max-width: 24rem;
   display: flex;
   flex-direction: column;
   gap: 0.4rem;
+  box-shadow: 0 20px 40px -24px rgba(16, 24, 40, 0.25);
 }
 
-.login-card h1 {
-  font-size: 1.3rem;
+.login-card h2 {
+  font-size: 1.5rem;
   margin: 0 0 0.25rem;
+  color: #101828;
+}
+
+@media (max-width: 800px) {
+  .login-screen {
+    flex-direction: column;
+  }
+
+  .login-brand {
+    min-height: 30vh;
+    padding: 2rem 1.5rem;
+  }
+
+  .login-form-panel {
+    padding: 2rem 1.5rem;
+  }
 }
 
 .login-card label {
