@@ -39,70 +39,108 @@
   min-height: 100vh;
   width: 100%;
   display: flex;
+  background: #ffffff;
   font-family: "Afacad", system-ui, -apple-system, "Segoe UI", sans-serif;
+  overflow: hidden;
 }
 
-.login-brand {
-  flex: 1 1 50%;
-  min-height: 40vh;
+.login-blob-panel {
+  position: relative;
+  flex: 1 1 48%;
+  min-height: 34rem;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(160deg, #041476, #2454c6 65%);
-  padding: 3rem 2rem;
+  overflow: hidden;
 }
 
-.login-brand-content {
+.login-blob {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(160deg, #041476, #2454c6 70%);
+  border-radius: 0 45% 35% 0 / 0 60% 40% 0;
+}
+
+.login-illustration {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: flex-end;
+  gap: 1rem;
+  margin-bottom: 6rem;
+}
+
+.chat-bubble {
+  background: #ffffff;
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 16px 30px -12px rgba(4, 20, 118, 0.5);
+}
+
+.chat-bubble-big {
+  width: 6.5rem;
+  height: 6.5rem;
+}
+
+.chat-bubble-small {
+  width: 4.5rem;
+  height: 4.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.login-blob-text {
+  position: absolute;
+  z-index: 1;
+  bottom: 3rem;
+  left: 0;
+  right: 0;
   text-align: center;
   color: #ffffff;
-  max-width: 26rem;
+  padding: 0 2rem;
 }
 
-.login-brand-title {
-  font-size: clamp(2.25rem, 5vw, 3rem);
+.login-blob-text h1 {
+  font-size: clamp(1.75rem, 4vw, 2.25rem);
   font-weight: 700;
   margin: 0 0 0.5rem;
 }
 
-.login-brand-subtitle {
-  font-size: 1.1rem;
+.login-blob-text p {
+  font-size: 1rem;
   color: #eef3ff;
-  margin: 0 0 2rem;
-}
-
-.login-brand-faces {
-  display: flex;
-  justify-content: center;
-  gap: 1rem;
-  flex-wrap: wrap;
+  margin: 0;
+  max-width: 22rem;
+  margin-inline: auto;
 }
 
 .login-form-panel {
-  flex: 1 1 50%;
+  flex: 1 1 52%;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--page-plane, #f8fafd);
   padding: 2rem;
 }
 
 .login-card {
-  background: #ffffff;
-  border: 1px solid rgba(16, 24, 40, 0.1);
-  border-radius: 0.75rem;
-  padding: 2.5rem;
   width: 100%;
-  max-width: 24rem;
+  max-width: 22rem;
   display: flex;
   flex-direction: column;
-  gap: 0.4rem;
-  box-shadow: 0 20px 40px -24px rgba(16, 24, 40, 0.25);
+  gap: 0.3rem;
 }
 
 .login-card h2 {
-  font-size: 1.5rem;
+  font-size: 1.6rem;
   margin: 0 0 0.25rem;
   color: #101828;
+  text-align: center;
+}
+
+.login-card > p.muted {
+  text-align: center;
+  margin-bottom: 1.5rem;
 }
 
 @media (max-width: 800px) {
@@ -110,9 +148,16 @@
     flex-direction: column;
   }
 
-  .login-brand {
-    min-height: 30vh;
-    padding: 2rem 1.5rem;
+  .login-blob-panel {
+    min-height: 20rem;
+  }
+
+  .login-blob {
+    border-radius: 0 0 45% 45% / 0 0 25% 25%;
+  }
+
+  .login-illustration {
+    margin-bottom: 4.5rem;
   }
 
   .login-form-panel {
@@ -121,26 +166,45 @@
 }
 
 .login-card label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
   font-size: 0.85rem;
-  color: #475467;
-  margin-top: 0.75rem;
+  color: #667085;
+  margin-top: 1.25rem;
+}
+
+.login-card label svg {
+  width: 1rem;
+  height: 1rem;
+  color: #2454c6;
+  flex-shrink: 0;
 }
 
 .login-card input {
-  padding: 0.6rem 0.75rem;
-  border-radius: 0.5rem;
-  border: 1px solid rgba(16, 24, 40, 0.15);
+  border: none;
+  border-bottom: 1.5px solid #e2e8f0;
+  padding: 0.5rem 0.1rem;
   font-size: 1rem;
+  background: transparent;
+  font-family: inherit;
+  transition: border-color 0.2s ease;
+}
+
+.login-card input:focus {
+  outline: none;
+  border-bottom-color: #2454c6;
 }
 
 .login-card button.primary {
-  margin-top: 1.25rem;
-  padding: 0.65rem;
-  border-radius: 0.5rem;
+  margin-top: 2rem;
+  padding: 0.75rem;
+  border-radius: 999px;
   border: none;
-  background: #101828;
+  background: linear-gradient(90deg, #2454c6, #5b7fe5);
   color: white;
   font-size: 1rem;
+  font-weight: 600;
   cursor: pointer;
 }
 
@@ -153,6 +217,7 @@
   color: #e47704;
   font-size: 0.85rem;
   margin-top: 0.5rem;
+  text-align: center;
 }
 
 @keyframes fadeInUp {
