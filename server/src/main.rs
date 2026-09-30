@@ -19,9 +19,9 @@ use models::{NewVote, UpdateReason, Vote};
 use serde::Deserialize;
 use sqlx::PgPool;
 use std::sync::Arc;
-use storage::R2Storage;
+use storage::PhotoStorage;
 use tokio::sync::broadcast;
-use tower_http::cors::CorsLayer;
+use tower_http::cors::{AllowOrigin, CorsLayer};
 use uuid::Uuid;
 
 struct AppState {
@@ -29,7 +29,7 @@ struct AppState {
     votes_tx: broadcast::Sender<Vote>,
     jwt_secret: String,
     kiosk_api_key: String,
-    r2: R2Storage,
+    photos: PhotoStorage,
 }
 
 #[tokio::main]
@@ -46,7 +46,19 @@ async fn main() -> anyhow::Result<()> {
         .expect("JWT_SECRET debe estar configurado (ver .env.example)");
     let kiosk_api_key = std::env::var("KIOSK_API_KEY")
         .expect("KIOSK_API_KEY debe estar configurado (ver .env.example)");
-    let r2 = R2Storage::from_env().expect("configuración de R2 incompleta (ver .env.example)");
+    let photos = PhotoStorage::from_env()?;
+    let retention_days: u64 = std::env::var("PHOTO_RETENTION_DAYS")
+        .ok()
+        .and_then(|v| v.parse().ok())
+        .unwrap_or(90);
+    tracing::info!(
+        "fotos en {}, retención {retention_days} días",
+        photos.root().display()
+    );
+    storage::spawn_retention(
+        photos.clone(),
+        std::time::Duration::from_secs(retention_days * 24 * 60 * 60),
+    );
 
     let (votes_tx, _) = broadcast::channel(100);
     let state = Arc::new(AppState {
@@ -54,10 +66,10 @@ async fn main() -> anyhow::Result<()> {
         votes_tx,
         jwt_secret,
         kiosk_api_key,
-        r2,
+        photos,
     });
 
-    let photos = Router::new()
+    let photo_routes = Router::new()
         .route("/uploads/{*key}", get(get_photo))
         .layer(middleware::from_fn_with_state(state.clone(), require_admin));
 
@@ -68,11 +80,13 @@ async fn main() -> anyhow::Result<()> {
         .route("/votes/{id}/reason", patch(update_reason))
         .route("/votes/{id}/photo", post(upload_photo))
         .route("/ws", get(ws_handler))
-        .merge(photos)
-        .layer(CorsLayer::permissive())
+        .merge(photo_routes)
+        .layer(cors_from_env())
         .with_state(state);
 
-    let listener = tokio::net::TcpListener::bind("0.0.0.0:3000").await?;
+    // En producción detrás de IIS usar 127.0.0.1:<puerto> para no exponerlo a la red.
+    let bind_addr = std::env::var("BIND_ADDR").unwrap_or_else(|_| "0.0.0.0:3000".into());
+    let listener = tokio::net::TcpListener::bind(&bind_addr).await?;
     tracing::info!("listening on {}", listener.local_addr()?);
     axum::serve(listener, app).await?;
 
@@ -187,7 +201,7 @@ async fn upload_photo(
 
     let object_key = storage::build_object_key(&kiosk_id, &id);
     state
-        .r2
+        .photos
         .upload_photo(&object_key, &bytes)
         .await
         .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
@@ -213,7 +227,7 @@ async fn get_photo(
     Path(key): Path<String>,
 ) -> Result<([(axum::http::header::HeaderName, &'static str); 1], Vec<u8>), StatusCode> {
     let bytes = state
-        .r2
+        .photos
         .fetch_photo(&key)
         .await
         .map_err(|_| StatusCode::NOT_FOUND)?;
@@ -236,4 +250,29 @@ async fn handle_socket(mut socket: WebSocket, state: Arc<AppState>) {
             break;
         }
     }
+}
+
+/// Orígenes permitidos para llamar a la API desde un navegador, separados por
+/// coma en `CORS_ORIGINS`. En producción el panel se sirve desde el mismo
+/// dominio que la API, así que puede quedar vacío (sin CORS). El kiosko no
+/// pasa por el navegador y no lo necesita.
+fn cors_from_env() -> CorsLayer {
+    let origins: Vec<axum::http::HeaderValue> = std::env::var("CORS_ORIGINS")
+        .unwrap_or_default()
+        .split(',')
+        .map(str::trim)
+        .filter(|o| !o.is_empty())
+        .filter_map(|o| o.parse().ok())
+        .collect();
+    CorsLayer::new()
+        .allow_origin(AllowOrigin::list(origins))
+        .allow_methods([
+            axum::http::Method::GET,
+            axum::http::Method::POST,
+            axum::http::Method::PATCH,
+        ])
+        .allow_headers([
+            axum::http::header::AUTHORIZATION,
+            axum::http::header::CONTENT_TYPE,
+        ])
 }

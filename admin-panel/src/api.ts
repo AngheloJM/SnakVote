@@ -1,7 +1,8 @@
 import type { Vote } from "./types";
 
-// TODO: mover a variable de entorno (VITE_SERVER_URL) al desplegar.
-export const SERVER_URL = "http://127.0.0.1:3000";
+// URL pública del servidor. Se fija al compilar desde VITE_SERVER_URL
+// (.env.development para `npm run dev`, .env.production para `npm run build`).
+export const SERVER_URL: string = import.meta.env.VITE_SERVER_URL ?? "http://127.0.0.1:3000";
 
 const TOKEN_KEY = "snakvote_admin_token";
 

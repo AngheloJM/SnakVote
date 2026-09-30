@@ -21,7 +21,7 @@ server/        API backend (Rust + Axum + SQLx + Postgres).
 2. Todo se guarda primero en una base **SQLite local** en el dispositivo
    (funciona sin internet).
 3. Un proceso en segundo plano sincroniza cada ~15s con el servidor: sube el
-   voto a **Postgres** y la foto a **Cloudflare R2**.
+   voto a **Postgres** y la foto a una carpeta del servidor (`PHOTOS_DIR`).
 4. El panel admin consulta la API (`GET /votes`, con filtros de fecha) y
    recibe actualizaciones en vivo por **WebSocket**.
 
@@ -33,7 +33,7 @@ server/        API backend (Rust + Axum + SQLx + Postgres).
 | Panel admin | React 19, TypeScript, Vite |
 | Servidor | Rust, Axum, SQLx (Postgres), JWT (jsonwebtoken), Argon2 |
 | Base de datos | PostgreSQL (auto-migraciones al arrancar el server) |
-| Fotos | Cloudflare R2 (S3-compatible), regla de borrado automático a los 90 días |
+| Fotos | Carpeta del servidor (`PHOTOS_DIR`), borrado automático a los 90 días |
 | Autenticación | JWT para el panel admin, clave compartida (`x-kiosk-key`) para el kiosko |
 
 ## Variables de entorno del servidor (`server/.env`)
@@ -47,10 +47,12 @@ claves. Resumen:
   el server si no existe (o se actualiza la contraseña si ya existe).
 - `KIOSK_API_KEY` — clave compartida que usa el kiosko para votar sin login
   de usuario.
-- `R2_ACCOUNT_ID` / `R2_ACCESS_KEY_ID` / `R2_SECRET_ACCESS_KEY` / `R2_BUCKET`
-  — credenciales de Cloudflare R2 (se puede usar un token de API de
-  Cloudflare con permisos de R2: el ID del token es el Access Key ID, y el
-  hash SHA-256 del token es el Secret Access Key).
+- `BIND_ADDR` — dirección y puerto donde escucha (por defecto `0.0.0.0:3000`;
+  en producción `127.0.0.1:<puerto libre>`).
+- `PHOTOS_DIR` — carpeta donde se guardan las fotos (obligatoria). En
+  producción, ruta absoluta fuera de las carpetas de IIS.
+- `PHOTO_RETENTION_DAYS` — fotos más viejas se borran una vez al día (por
+  defecto 90).
 
 ## Desarrollo local
 
@@ -69,8 +71,10 @@ cd admin-panel
 npm install
 npm run dev
 ```
-Corre en `http://localhost:5173`. Apunta a `SERVER_URL` definido en
-`admin-panel/src/api.ts`.
+Corre en `http://localhost:5173`. La URL del servidor sale de
+`VITE_SERVER_URL`: `admin-panel/.env.development` para desarrollo y
+`admin-panel/.env.production` para el
+build de producción.
 
 ### Kiosko (desktop, para probar rápido)
 ```bash
@@ -133,7 +137,6 @@ Rust, y Postgres en otro servidor Windows separado.
 
 - [x] Servidor compilado y corriendo en el Windows Server, conectado a
       Postgres real.
-- [x] R2 configurado y probado de punta a punta.
 - [ ] IIS como proxy reverso + HTTPS.
 - [ ] Servidor registrado como Servicio de Windows.
 - [ ] Panel admin desplegado como sitio estático.
@@ -146,7 +149,9 @@ Rust, y Postgres en otro servidor Windows separado.
 - Las fotos son datos sensibles (potencialmente identifican empleados/
   clientes) — acceso al panel admin requiere login, y las fotos se sirven
   vía un proxy autenticado del servidor (nunca públicas directamente desde
-  R2). Retención automática de 90 días configurada en el bucket.
+  la carpeta de fotos). Retención automática de 90 días (tarea diaria del
+  server). La carpeta de fotos debe tener permisos solo para la cuenta del
+  servicio y estar incluida en los backups.
 - `server/.env`, `admin-panel` no tiene secretos propios (solo usa el token
   del login guardado en `localStorage`), y `kiosk-app/keystore/` están
   excluidos de git. Nunca commitear credenciales reales.
