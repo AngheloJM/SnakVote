@@ -137,9 +137,8 @@ Internet / red interna ──443──► IIS, sitio "votokiosco" (votokiosco.co
   (compartido con los demás sitios del servidor). Requiere URL Rewrite, ARR
   con proxy habilitado y la característica "Protocolo WebSocket".
   Reglas en `admin-panel/public/web.config` (se copia a `dist/` al compilar).
-- **Acceso desde internet**: solo las rutas del kiosko (`POST /votes`,
-  `POST /votes/{id}/photo`). El panel y las fotos responden 403 si la IP de
-  origen no es privada (red interna o VPN).
+- **Acceso**: panel y API accesibles desde la red interna y desde internet
+  (los kioskos pueden sincronizar por datos móviles).
 - **Servicio**: `VotoKiosco` (NSSM, `C:\Program Files\nssm\nssm.exe`),
   cuenta `NT SERVICE\VotoKiosco`, ejecuta
   `C:\inetpub\SnakVote\server\target\release\server.exe` con
