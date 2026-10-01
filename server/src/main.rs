@@ -206,7 +206,7 @@ async fn list_votes(
 
 async fn update_reason(
     State(state): State<Arc<AppState>>,
-    _auth: AdminAuth,
+    auth: AdminAuth,
     Path(id): Path<Uuid>,
     Json(payload): Json<UpdateReason>,
 ) -> Result<Json<Vote>, StatusCode> {
@@ -223,6 +223,7 @@ async fn update_reason(
     .map_err(internal_error)?
     .ok_or(StatusCode::NOT_FOUND)?;
 
+    tracing::info!("{} actualizó el motivo del voto {id}", auth.email);
     Ok(Json(vote))
 }
 
