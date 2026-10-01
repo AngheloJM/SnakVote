@@ -22,6 +22,9 @@ export async function login(email: string, password: string): Promise<void> {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ email, password }),
   });
+  if (res.status === 429)
+    throw new Error("Demasiados intentos fallidos. Espera 15 minutos e inténtalo de nuevo.");
+  if (res.status === 403) throw new Error("El panel solo está disponible desde la red interna.");
   if (!res.ok) throw new Error("Correo o contraseña incorrectos");
   const data: { token: string } = await res.json();
   localStorage.setItem(TOKEN_KEY, data.token);

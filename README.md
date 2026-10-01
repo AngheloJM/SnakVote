@@ -43,8 +43,12 @@ claves. Resumen:
 
 - `DATABASE_URL` — conexión a Postgres.
 - `JWT_SECRET` — firma de los tokens del panel admin.
-- `ADMIN_EMAIL` / `ADMIN_PASSWORD` — se siembra un usuario admin al arrancar
-  el server si no existe (o se actualiza la contraseña si ya existe).
+- `ADMIN_EMAIL` / `ADMIN_PASSWORD` — opcionales, solo para el primer
+  arranque: crean ese usuario si no existe (nunca sobrescriben una
+  contraseña). Para crear usuarios o cambiar contraseñas:
+  `server crear-admin <correo>` (pide la contraseña por consola, mínimo 12
+  caracteres). Después del primer arranque conviene borrar
+  `ADMIN_PASSWORD` del `.env`.
 - `KIOSK_API_KEY` — clave compartida que usa el kiosko para votar sin login
   de usuario.
 - `BIND_ADDR` — dirección y puerto donde escucha (por defecto `0.0.0.0:3000`;
@@ -118,31 +122,57 @@ ver `kiosk-app/KIOSK_MODE.md` (requiere configurar el dispositivo como
 
 ## Despliegue en producción
 
-Arquitectura actual: Windows Server propio (no un PaaS como
-Render/Railway), con IIS de proxy reverso hacia el binario del servidor
-Rust, y Postgres en otro servidor Windows separado.
+Windows Server propio con IIS; Postgres en otro
+servidor. Repo clonado en `C:\inetpub\SnakVote`.
 
-- **Servidor Rust**: se compila directo en el Windows Server
-  (`cargo build --release`, requiere Visual Studio Build Tools + Rust). El
-  `.exe` corre en un puerto local (ej. `3000`) y debería estar registrado
-  como Servicio de Windows para que arranque solo.
-- **IIS**: hace de proxy reverso (ARR + URL Rewrite) desde el dominio
-  público con HTTPS hacia `localhost:3000`, y sirve el panel admin
-  (`admin-panel`, build estático) como sitio separado.
-- **Postgres**: base y usuario dedicados por app (no se usa el superusuario
-  para la conexión de la app). Ver `server/examples/setup_db.rs` para el
-  script de aprovisionamiento (crea rol + base con permisos acotados).
+```
+Internet / red interna ──443──► IIS, sitio "votokiosco" (votokiosco.conecta.com.bo)
+                                 ├─ /auth /votes /uploads /ws /health ─► proxy ARR ─► 127.0.0.1:3000
+                                 │                                        (servicio "VotoKiosco", NSSM)
+                                 └─ resto ─► C:\inetpub\SnakVote\admin-panel\dist
+```
+
+- **Sitio IIS**: enlaces `https *:443` y `http *:80` con nombre de host
+  `votokiosco.conecta.com.bo`, certificado comodín `*.conecta.com.bo`
+  (compartido con los demás sitios del servidor). Requiere URL Rewrite, ARR
+  con proxy habilitado y la característica "Protocolo WebSocket".
+  Reglas en `admin-panel/public/web.config` (se copia a `dist/` al compilar).
+- **Acceso desde internet**: solo las rutas del kiosko (`POST /votes`,
+  `POST /votes/{id}/photo`). El panel y las fotos responden 403 si la IP de
+  origen no es privada (red interna o VPN).
+- **Servicio**: `VotoKiosco` (NSSM, `C:\Program Files\nssm\nssm.exe`),
+  cuenta `NT SERVICE\VotoKiosco`, ejecuta
+  `C:\inetpub\SnakVote\server\target\release\server.exe` con
+  `AppDirectory` = `C:\inetpub\SnakVote\server` (ahí está el `.env`).
+  Logs en `server\logs\server.log`.
+- **Fotos**: `E:\FotoKiosco` (en `.env`: `PHOTOS_DIR='E:\FotoKiosco'`, con
+  comillas simples).
+
+### Actualizar
+
+```powershell
+$nssm = "C:\Program Files\nssm\nssm.exe"
+& $nssm stop VotoKiosco
+cd C:\inetpub\SnakVote; git pull
+cd server; cargo build --release
+cd ..\admin-panel; npm ci; npm run build
+& $nssm start VotoKiosco
+```
+
+No ejecutar `git reset --hard` ni restaurar `server/migrations`: en el
+servidor esos archivos tienen finales de línea CRLF y los checksums
+guardados en la base corresponden a esa versión.
 
 ### Estado del despliegue (ir actualizando)
 
-- [x] Servidor compilado y corriendo en el Windows Server, conectado a
-      Postgres real.
-- [ ] IIS como proxy reverso + HTTPS.
-- [ ] Servidor registrado como Servicio de Windows.
-- [ ] Panel admin desplegado como sitio estático.
-- [ ] Kiosko y panel apuntando a la URL/dominio final (hoy apuntan a IPs de
-      red local de pruebas).
-- [ ] CORS restringido al dominio final (hoy en modo permisivo).
+- [x] Servidor compilado y corriendo como Servicio de Windows (NSSM).
+- [x] IIS como proxy reverso + HTTPS (probado con `curl --resolve`).
+- [x] Panel admin desplegado como sitio estático.
+- [x] CORS restringido (vacío en producción: mismo dominio).
+- [ ] Registro DNS `votokiosco.conecta.com.bo` (interno y público) — pedido a IT.
+- [ ] APK del kiosko compilado con `SERVER_URL` y `KIOSK_API_KEY` de producción.
+- [ ] Backups de `E:\FotoKiosco` y de la base.
+- [ ] Probar reinicio del servidor (el servicio debe arrancar solo).
 
 ## Notas de seguridad
 
@@ -152,6 +182,8 @@ Rust, y Postgres en otro servidor Windows separado.
   la carpeta de fotos). Retención automática de 90 días (tarea diaria del
   server). La carpeta de fotos debe tener permisos solo para la cuenta del
   servicio y estar incluida en los backups.
+- Login del panel: tras 5 intentos fallidos una IP queda bloqueada 15
+  minutos (respuesta 429).
 - `server/.env`, `admin-panel` no tiene secretos propios (solo usa el token
   del login guardado en `localStorage`), y `kiosk-app/keystore/` están
   excluidos de git. Nunca commitear credenciales reales.

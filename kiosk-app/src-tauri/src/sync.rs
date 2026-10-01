@@ -50,13 +50,16 @@ pub async fn sync_pending(app_handle: &tauri::AppHandle) {
     }
     let _guard = ResetOnDrop;
 
+    // Primero los que menos reintentos llevan: un voto que falla siempre
+    // (p. ej. foto dañada) no debe bloquear la sincronización de los nuevos.
     let state = app_handle.state::<Db>();
     let pending: Vec<(String, String, String, Option<String>, String, String)> = {
         let conn = state.0.lock().unwrap();
         let mut stmt = conn
             .prepare(
                 "SELECT id, kiosk_id, satisfaction, quick_comment, photo_path, created_at
-                 FROM votes WHERE status = 'pending' ORDER BY created_at ASC LIMIT 5",
+                 FROM votes WHERE status = 'pending'
+                 ORDER BY retry_count ASC, created_at ASC LIMIT 5",
             )
             .unwrap();
         stmt.query_map([], |row| {
@@ -112,6 +115,9 @@ pub async fn sync_pending(app_handle: &tauri::AppHandle) {
 async fn upload_photo(client: &reqwest::Client, vote_id: &str, photo_path: &PathBuf) -> bool {
     let bytes = match tokio::fs::read(photo_path).await {
         Ok(b) => b,
+        // Sin foto en disco no hay nada que reintentar: el voto ya llegó al
+        // servidor, así que se da por sincronizado (queda sin foto).
+        Err(e) if e.kind() == std::io::ErrorKind::NotFound => return true,
         Err(_) => return false,
     };
 
